@@ -11,7 +11,7 @@
   * { box-sizing:border-box; margin:0; }
   /* one screen per section: on desktop every scroll gesture lands on the next section, never between or past one */
   html { scroll-snap-type:y proximity; scrollbar-color:#5A5953 var(--shell-bg); }
-  @media (min-width:761px){ html { scroll-snap-type:y mandatory; } header.hero, .project, .contact { scroll-snap-stop:always; } }
+  @media (min-width:761px) and (min-height:560px){ html { scroll-snap-type:y mandatory; } header.hero, .project, .contact { scroll-snap-stop:always; } }
   @media (prefers-reduced-motion:no-preference){ html { scroll-behavior:smooth; } }
   .project, .contact { min-height:100vh; min-height:100svh; scroll-snap-align:start; }
   body { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--shell-bg); color:var(--shell-fg); }
@@ -30,7 +30,7 @@
     transition:background-color .35s cubic-bezier(.16,1,.3,1), transform .35s cubic-bezier(.16,1,.3,1), opacity .6s ease; }
   .site:not(.show) { background:transparent; color:#16130F; --muted-c:#5A5246; --focus:#16130F; transform:translateY(9px); }
   .site:not(.show) .me { visibility:hidden; }
-  .site.intro { opacity:0; pointer-events:none; }
+  .site.intro:not(.show) { opacity:0; pointer-events:none; }
   @media (prefers-reduced-motion:reduce){ .site { transition:none; } }
   .site { --menu-bg:#1E1E1C; --menu-hover:#2C2C29; }
   .site:not(.show) { --menu-bg:#FFFCF5; --menu-hover:#ECE4D4; }
@@ -51,7 +51,8 @@
   .site nav a { display:block; padding:10px; font-size:15px; text-decoration:none; color:var(--muted-c); border-radius:8px; }
   .site nav a:hover { color:inherit; }
   .site nav a[aria-current] { color:inherit; text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:8px; }
-  @media (max-width:560px){ .site .me { display:none; } .site nav { margin:0 auto; } .site nav a { padding:10px 8px; font-size:14px; } }
+  @media (max-width:560px){ .site .me { display:none; } .site { gap:8px; } .site nav { margin-right:auto; } .site nav a { padding:10px 7px; font-size:14px; } .cv summary { padding:6px 9px 6px 12px; } }
+  @media (max-width:374px){ .site nav a { padding:10px 5px; font-size:13px; } }
 
   .note { position:absolute; top:12px; right:12px; z-index:6; font:12px/1.4 system-ui; background:#FFE9A8; color:#222; padding:6px 10px; border-radius:6px; }
   .skip { position:fixed; left:16px; top:12px; z-index:20; padding:10px 16px; border-radius:8px; background:var(--shell-bg); color:var(--shell-fg); font-weight:600; text-decoration:none; transform:translateY(-200%); }
@@ -135,7 +136,27 @@
   .paper-layer .f-index a::before { display:none; }
   .paper-layer .f-index { font-family:"Patrick Hand",cursive; font-size:16px; line-height:1.7; }
   @media (prefers-reduced-motion:reduce){ .card, .f-front, .f-back, .card .c-stat::after { transition:none; } }
-  @media (max-width:900px){ .hero-in { grid-template-columns:1fr; row-gap:48px; } }
+  /* one column: the folder sits under the copy, with room above it for the fan */
+  @media (max-width:900px){ .hero-in { grid-template-columns:1fr; row-gap:170px; } }
+  @media (max-width:560px){
+    header.hero { padding-top:76px; }
+    .hero-in { row-gap:120px; }
+    .folder { zoom:.78; }
+    .hero.out li:nth-child(1) .card, .folder:hover li:nth-child(1) .card, .folder:focus-within li:nth-child(1) .card { --tx:-50px; --ty:-165px; --r:-6deg; }
+    .hero.out li:nth-child(2) .card, .folder:hover li:nth-child(2) .card, .folder:focus-within li:nth-child(2) .card { --tx:-25px; --ty:-125px; --r:-2deg; }
+    .hero.out li:nth-child(3) .card, .folder:hover li:nth-child(3) .card, .folder:focus-within li:nth-child(3) .card { --tx:0px;   --ty:-85px;  --r:2deg; }
+  }
+  @media (max-width:380px){ .folder { zoom:.72; } }
+  @media (max-width:400px){ .page .kpi.evidence { grid-template-columns:1fr; } }
+  /* large screens: a wider column and a slightly larger folder, so the hero doesn't float in empty paper */
+  @media (min-width:1600px) and (min-height:860px){
+    .hero-in { max-width:1400px; grid-template-columns:minmax(0,1fr) 530px; }
+    .site { padding:0 calc((100% - 1400px) / 2); }
+    .folder { zoom:1.15; }
+    .pos { font-size:26px; }
+    .deg { font-size:16px; }
+    .page.wide { max-width:1180px; }
+  }
   @media (prefers-reduced-motion:reduce){ .folder:hover .card, .folder:focus-within .card, .folder .card:hover, .folder .card:focus-visible, .f-cards, .folder.peek .f-cards { transition:none; } }
   /* A: the hero opens as a paper wireframe (a cloned layer: dot grid, marker lettering, outlined blocks with hard shadows).
      The name is written by hand, then every element turns hi-fi on its own through "spreading spots":
@@ -290,8 +311,8 @@
   .pager > button:not([aria-disabled="true"]):hover { background:var(--primary); color:var(--on-primary); }
   .pager > button[aria-disabled="true"] { color:color-mix(in srgb, var(--primary) 35%, transparent); border-color:color-mix(in srgb, var(--primary) 30%, transparent); cursor:default; }
   button.cta { font:inherit; font-weight:600; border:0; cursor:pointer; }
-  /* phones: the 4 pages stack vertically, no sideways track inside a vertical page */
-  @media (max-width:760px){
+  /* phones and short landscape screens: the pages stack vertically, no sideways track inside a vertical page */
+  @media (max-width:760px), (max-height:559px){
     .project.paged { height:auto; min-height:0; overflow:visible; }
     .track { display:block; height:auto; overflow:visible; }
     .panel { height:auto; padding:72px 16px 40px; overflow:visible; }
@@ -329,7 +350,20 @@
   /* Mentor pages: two columns where a screen sits next to the text */
   .page.wide { max-width:1040px; }
   .split { display:grid; grid-template-columns:1.4fr 1fr; gap:56px; align-items:center; }
-  @media (max-width:760px){ .split { grid-template-columns:1fr; gap:28px; } }
+  @media (max-width:760px){ .split { grid-template-columns:1fr; gap:28px; }
+    .evidence-row { grid-template-columns:1fr; }
+    .phones { gap:12px; }
+    .phones figure { flex:1 1 0; min-width:0; }
+    .phones .m-phone { width:100%; max-width:240px; height:auto; } }
+  /* portrait tablets: enough height to stack text over the visual, one page at a time */
+  @media (min-width:761px) and (max-width:1023px) and (orientation:portrait) and (min-height:900px){
+    .project .page.split:not(.brief-split):not(.guard-split) { grid-template-columns:1fr; gap:32px; }
+    .panel { padding-bottom:84px; }
+    .concept-shot { max-height:30vh; object-fit:cover; }
+    .project .page.wide { max-width:640px; }
+    .phone-shot, .phone-shot.big { height:min(36vh,420px); }
+    .phones .m-phone { height:min(34vh,400px); }
+  }
   .myrole { margin-top:14px; font-size:16px; line-height:1.5; }
   .myrole b { color:var(--primary); }
   .kpi.compact { gap:20px; margin:20px 0 24px; }
@@ -781,7 +815,7 @@
   }
 
   // horizontal pages (desktop): arrows + named tabs keep focus where it is; the in-page CTA moves it to the new heading
-  const wide = matchMedia("(min-width: 761px)");
+  const wide = matchMedia("(min-width: 761px) and (min-height: 560px)");
   document.querySelectorAll(".paged").forEach(sec => {
     const track = sec.querySelector(".track"), panels = [...track.children], n = panels.length;
     const prev = sec.querySelector(".pager .prev"), next = sec.querySelector(".pager .next"), tabs = sec.querySelector(".tabs"), live = sec.querySelector("[aria-live]");
