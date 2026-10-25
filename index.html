@@ -90,17 +90,17 @@
     text-decoration:none; transform-origin:50% 100%; transform:translate(var(--tx),calc(var(--ty) - var(--lift))) rotate(var(--r));
     box-shadow:inset 0 1px 0 rgba(255,255,255,.22), 0 1px 1px rgba(0,0,0,.10), 0 3px 6px -1px rgba(0,0,0,.16), 0 12px 24px -8px rgba(0,0,0,.28), 0 28px 48px -20px rgba(0,0,0,.35);
     transition:transform .32s cubic-bezier(.4,0,.2,1), box-shadow .3s, background .45s, color .45s, border-color .45s; }
-  .folder:hover .card, .folder:focus-within .card { transition:transform .6s cubic-bezier(.16,1,.3,1) calc(var(--i) * 55ms), box-shadow .3s; }
+  .folder:hover .card, .folder:focus-within .card, .folder.open .card { transition:transform .6s cubic-bezier(.16,1,.3,1) calc(var(--i) * 55ms), box-shadow .3s; }
   .folder .card:hover, .folder .card:focus-visible { transition:transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s; }
   .f-cards { transition:transform .5s cubic-bezier(.16,1,.3,1); }
   .folder.peek .f-cards { transform:translateY(-16px); transition:transform .45s cubic-bezier(.16,1,.3,1); }
   .f-cards li:nth-child(1) .card { --tx:-14px; --ty:-14px; --r:-5deg; }
   .f-cards li:nth-child(2) .card { --tx:0px;   --ty:-28px; --r:1deg; }
   .f-cards li:nth-child(3) .card { --tx:14px;  --ty:-6px;  --r:5deg; }
-  .folder:hover .f-front, .folder:focus-within .f-front { transform:rotateX(-16deg); }
-  .folder:hover li:nth-child(1) .card, .folder:focus-within li:nth-child(1) .card { --tx:-215px; --ty:-204px; --r:-7deg; }
-  .folder:hover li:nth-child(2) .card, .folder:focus-within li:nth-child(2) .card { --tx:-108px; --ty:-160px; --r:-3deg; }
-  .folder:hover li:nth-child(3) .card, .folder:focus-within li:nth-child(3) .card { --tx:0px;    --ty:-124px; --r:2deg; }
+  .folder:hover .f-front, .folder:focus-within .f-front, .folder.open .f-front { transform:rotateX(-16deg); }
+  .folder:hover li:nth-child(1) .card, .folder:focus-within li:nth-child(1) .card, .folder.open li:nth-child(1) .card { --tx:-215px; --ty:-204px; --r:-7deg; }
+  .folder:hover li:nth-child(2) .card, .folder:focus-within li:nth-child(2) .card, .folder.open li:nth-child(2) .card { --tx:-108px; --ty:-160px; --r:-3deg; }
+  .folder:hover li:nth-child(3) .card, .folder:focus-within li:nth-child(3) .card, .folder.open li:nth-child(3) .card { --tx:0px;    --ty:-124px; --r:2deg; }
   .f-cards li:hover, .f-cards li:focus-within { z-index:9; }
   /* intro: the cards start out of the folder, turn hi-fi there, then drop in (front card first) and bounce once */
   .hero.out li:nth-child(1) .card { --tx:-215px; --ty:-204px; --r:-7deg; }
@@ -137,16 +137,29 @@
   .paper-layer .f-index { font-family:"Patrick Hand",cursive; font-size:16px; line-height:1.7; }
   @media (prefers-reduced-motion:reduce){ .card, .f-front, .f-back, .card .c-stat::after { transition:none; } }
   /* one column: the folder sits under the copy, with room above it for the fan */
-  @media (max-width:900px){ .hero-in { grid-template-columns:1fr; row-gap:170px; } }
-  @media (max-width:560px){
-    header.hero { padding-top:76px; }
-    .hero-in { row-gap:120px; }
-    .folder { zoom:.78; }
-    .hero.out li:nth-child(1) .card, .folder:hover li:nth-child(1) .card, .folder:focus-within li:nth-child(1) .card { --tx:-50px; --ty:-165px; --r:-6deg; }
-    .hero.out li:nth-child(2) .card, .folder:hover li:nth-child(2) .card, .folder:focus-within li:nth-child(2) .card { --tx:-25px; --ty:-125px; --r:-2deg; }
-    .hero.out li:nth-child(3) .card, .folder:hover li:nth-child(3) .card, .folder:focus-within li:nth-child(3) .card { --tx:0px;   --ty:-85px;  --r:2deg; }
+  /* one column: the fan turns vertical (straight up, each card shows its title strip), so it never leaves the screen */
+  @media (max-width:900px){
+    .hero-in { grid-template-columns:1fr; row-gap:230px; }
+    .hero.out li:nth-child(1) .card, .folder:hover li:nth-child(1) .card, .folder:focus-within li:nth-child(1) .card, .folder.open li:nth-child(1) .card { --tx:0px; --ty:-250px; --r:0deg; }
+    .hero.out li:nth-child(2) .card, .folder:hover li:nth-child(2) .card, .folder:focus-within li:nth-child(2) .card, .folder.open li:nth-child(2) .card { --tx:0px; --ty:-172px; --r:0deg; }
+    .hero.out li:nth-child(3) .card, .folder:hover li:nth-child(3) .card, .folder:focus-within li:nth-child(3) .card, .folder.open li:nth-child(3) .card { --tx:0px; --ty:-94px;  --r:0deg; }
   }
-  @media (max-width:380px){ .folder { zoom:.72; } }
+  @media (max-width:720px){ header.hero { padding-top:76px; } }
+  @media (max-width:560px){
+    .hero-in { row-gap:180px; }
+    .folder { zoom:.78; }
+  }
+  @media (max-width:380px){ .folder { zoom:.72; } .hero-in { row-gap:170px; } }
+  /* touch: no hover, so the first tap opens the fan (.open, set in JS) and the second picks a project; a sticky :hover must not open it */
+  @media (hover:none){
+    .folder:not(.open):hover li:nth-child(1) .card { --tx:-14px; --ty:-14px; --r:-5deg; }
+    .folder:not(.open):hover li:nth-child(2) .card { --tx:0px;   --ty:-28px; --r:1deg; }
+    .folder:not(.open):hover li:nth-child(3) .card { --tx:14px;  --ty:-6px;  --r:5deg; }
+    .folder:not(.open):hover .f-front { transform:none; }
+    .card:hover { --lift:0px; }
+    .folder.open .f-front { pointer-events:auto; }
+    .folder { -webkit-tap-highlight-color:transparent; }
+  }
   @media (max-width:400px){ .page .kpi.evidence { grid-template-columns:1fr; } }
   /* large screens: a wider column and a slightly larger folder, so the hero doesn't float in empty paper */
   @media (min-width:1600px) and (min-height:860px){
@@ -845,6 +858,20 @@
     document.querySelectorAll(`a[href="#${sec.id}"]`).forEach(a => a.addEventListener("click", () => track.scrollTo({ left: 0 })));
     track.addEventListener("scroll", update, { passive: true }); wide.addEventListener("change", update); update();
   });
+
+  // folder on touch: first tap fans the cards out, a tap on a card then opens that project; a tap elsewhere closes it.
+  // Mouse and keyboard keep the hover / focus behaviour.
+  const tf = hero.querySelector(".hero-in:not(.paper-layer) .folder"); // not the intro's paper twin
+  let touch = false;
+  const closeFolder = () => { tf.classList.remove("open"); if (tf.contains(document.activeElement)) document.activeElement.blur(); };
+  tf.addEventListener("pointerdown", e => { touch = e.pointerType !== "mouse"; });
+  tf.addEventListener("click", e => {
+    if (!touch) return;
+    if (!tf.classList.contains("open")) { e.preventDefault(); tf.classList.add("open"); }
+    else if (e.target.closest(".card")) setTimeout(closeFolder, 600);
+    else closeFolder();
+  });
+  document.addEventListener("pointerdown", e => { if (tf.classList.contains("open") && !tf.contains(e.target)) closeFolder(); });
 
   // site header: hidden over the hero, then shows where you are
   const site = document.querySelector(".site"), links = [...site.querySelectorAll("nav a")];
